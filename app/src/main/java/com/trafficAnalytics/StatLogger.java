@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class StatLogger {
     // Using and writing to files -- https://developer.android.com/training/basics/data-storage/files.html
-    private final String filename = "statslog.txt";
+    private static final String filename = "statslog.txt";
     private ConcurrentLinkedQueue<String> outputBuffer;
     private File logfile;
     private String TAG = "StatLogger";
@@ -85,8 +85,9 @@ public class StatLogger {
         outputBuffer.add(System.currentTimeMillis()+" "+text);
     }
 
-    public Queue<String> getRecords(Context context) {
+    public static Queue<String> getRecords(Context context) {
         Queue<String> lines = new LinkedList<>();
+        File logfile = new File(context.getExternalFilesDir("testing"), filename);
         if (logfile.exists()) {
             try {
 

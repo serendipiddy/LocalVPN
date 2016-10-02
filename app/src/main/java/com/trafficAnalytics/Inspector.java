@@ -21,10 +21,8 @@ import xyz.hexene.localvpn.Packet;
  * Created by iddy on 2/10/2016.
  */
 public class Inspector {
-    private final String TAG = "Inspector";
+    private static final String TAG = "Inspector";
     private HashSet<InetAddress> destinations;
-    private HashMap<InetAddress, Integer[]> seen;
-    private final int MAX_PKT_SIZE = 65535;
     private StatLogger logger;
 
     public Inspector(Collection<InetAddress> destinations, Context context) {
@@ -38,7 +36,6 @@ public class Inspector {
 
     private void init(Context context) {
         destinations = new HashSet<InetAddress>();
-        seen = new HashMap<InetAddress, Integer[]>();
         logger = new StatLogger(context);
     }
 
@@ -50,25 +47,12 @@ public class Inspector {
 
     }
 
-    public List<TrafficStat> getIpAddrStats(){
-        List<TrafficStat> rv = new ArrayList<>();
-
-        for (Map.Entry<InetAddress,Integer[]> e: seen.entrySet()) {
-            TrafficStat ts = new TrafficStat(e.getKey().getHostAddress(), e.getValue());
-            rv.add(ts);
-        }
-
-        Collections.sort(rv);
-
-        return rv;
-    }
-
-    public List<TrafficStat> readStatsFromFile(Context context) {
+    static public List<TrafficStat> readStatsFromFile(Context context) {
         HashMap<String, Integer[]> host_stats = new HashMap<>();
 
         /* Populate the host records */
-        for (String s : logger.getRecords(context)) {
-            s.replace("/","");
+        for (String s : StatLogger.getRecords(context)) {
+            s = s.replace("/","");
             StringTokenizer st = new StringTokenizer(s," ");
             // time proto direction src dst p q len
             String time = st.nextToken();
@@ -99,8 +83,8 @@ public class Inspector {
 
         /* Convert host records into a list */
         List<TrafficStat> rv = new ArrayList<>();
-        for (Map.Entry<InetAddress,Integer[]> e: seen.entrySet()) {
-            TrafficStat ts = new TrafficStat(e.getKey().getHostAddress(), e.getValue());
+        for (Map.Entry<String,Integer[]> entry: host_stats.entrySet()) {
+            TrafficStat ts = new TrafficStat(entry.getKey(), entry.getValue());
             rv.add(ts);
         }
         Collections.sort(rv);
@@ -134,36 +118,15 @@ public class Inspector {
         }
         else {
             logger.log(
-                    "Other " + (rx ? "Rx " : "Tx ") +
+                    packet.ip4Header.getProtocolNum() + (rx ? "Rx " : "Tx ") +
                             packet.ip4Header.sourceAddress + " " +
-                            packet.ip4Header.destinationAddress + " " +
-                            packet.ip4Header.getProtocolNum()
+                            packet.ip4Header.destinationAddress + " - - " +
+                            (packet.ip4Header.totalLength - packet.ip4Header.headerLength)
                     );
         }
-
-        if (rx) {
-            InetAddress src = packet.ip4Header.sourceAddress;
-            if (!seen.containsKey(src)) {
-                Log.i(TAG, "New source: "+src.getHostAddress());
-                seen.put(src, new Integer[]{0,0,0,0});
-//            seen.put(dest, new Integer[MAX_PKT_SIZE]);
-            }
-            seen.get(src)[1] = seen.get(src)[1] + 1;
-            seen.get(src)[3] = seen.get(src)[3] + packet.ip4Header.totalLength;
-        }
-        else {
-            InetAddress dest = packet.ip4Header.destinationAddress;
-            if (!seen.containsKey(dest)) {
-                Log.i(TAG, "New destination: "+dest.getHostAddress());
-                seen.put(dest, new Integer[]{0,0,0,0});
-            }
-            seen.get(dest)[0] = seen.get(dest)[0] + 1;
-            seen.get(dest)[2] = seen.get(dest)[2] + packet.ip4Header.totalLength;
-        }
-
     }
 
-    public class TrafficStat implements Comparable<TrafficStat> {
+    public static class TrafficStat implements Comparable<TrafficStat> {
         public String address;
         public int tx;
         public int tx_bytes;

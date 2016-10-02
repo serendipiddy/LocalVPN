@@ -82,11 +82,7 @@ public class LocalVPN extends ActionBarActivity
              */
             @Override
             public void onClick(View v) {
-                if (LocalVPNService.inspector == null) {
-                    Log.i("LocalVPN", "inspector no init");
-                    return;
-                }
-                List<Inspector.TrafficStat> traffic = LocalVPNService.inspector.readStatsFromFile(getBaseContext());
+                List<Inspector.TrafficStat> traffic = Inspector.readStatsFromFile(getBaseContext());
 
                 List<String> items = new ArrayList<>();
                 for (Inspector.TrafficStat ts : traffic) {
