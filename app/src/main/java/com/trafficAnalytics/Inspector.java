@@ -7,10 +7,12 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import xyz.hexene.localvpn.Packet;
 
@@ -54,6 +56,9 @@ public class Inspector {
             TrafficStat ts = new TrafficStat(e.getKey().getHostAddress(), e.getValue());
             rv.add(ts);
         }
+
+        Collections.sort(rv);
+
         return rv;
     }
 
@@ -114,7 +119,7 @@ public class Inspector {
 
     }
 
-    public class TrafficStat {
+    public class TrafficStat implements Comparable<TrafficStat> {
         public String address;
         public int tx;
         public int tx_bytes;
@@ -129,22 +134,38 @@ public class Inspector {
             this.rx_bytes = counts[3];
         }
 
-        public String getDomainName() {
-            HostRequest hs = new HostRequest();
-            hs.execute(this.address);
-            try {
-                return hs.get();
-            } catch (Exception e) {
-                Log.e(TAG, "Failed to get address");
-            }
-            return address;
-        }
-
         public String toString() {
             return address
                     +"\n    rx:"+rx+"/"+rx_bytes+"B"
                     +"\n    tx:"+tx+"/"+tx_bytes+"B";
         }
 
+        public Integer[] addrToIntArray(String addr) {
+            Log.i(TAG, addr);
+            StringTokenizer st = new StringTokenizer(addr, ".");
+            Integer[] iAddr = new Integer[]{
+                    Integer.parseInt(st.nextToken()),
+                    Integer.parseInt(st.nextToken()),
+                    Integer.parseInt(st.nextToken()),
+                    Integer.parseInt(st.nextToken())};
+            return iAddr;
+        }
+
+        @Override
+        public int compareTo(TrafficStat o) {
+            Integer[] self  = addrToIntArray(address);
+            Integer[] other = addrToIntArray(o.address);
+
+            if (self[0].equals(other[0])) {
+                if (self[1].equals(other[1])) {
+                    if (self[2].equals(other[2])) {
+                        return self[3].compareTo(other[3]);
+                    }
+                    return self[2].compareTo(other[2]);
+                }
+                return self[1].compareTo(other[1]);
+            }
+            return self[0].compareTo(other[0]);
+        }
     }
 }
