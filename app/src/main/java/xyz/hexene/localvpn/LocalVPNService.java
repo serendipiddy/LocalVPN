@@ -57,6 +57,7 @@ public class LocalVPNService extends VpnService
     private Selector udpSelector;
     private Selector tcpSelector;
 
+    public static Inspector inspector;
     @Override
     public void onCreate()
     {
@@ -71,6 +72,7 @@ public class LocalVPNService extends VpnService
             deviceToNetworkTCPQueue = new ConcurrentLinkedQueue<>();
             networkToDeviceQueue = new ConcurrentLinkedQueue<>();
 
+            inspector = new Inspector();
             executorService = Executors.newFixedThreadPool(5);
             executorService.submit(new UDPInput(networkToDeviceQueue, udpSelector));
             executorService.submit(new UDPOutput(deviceToNetworkUDPQueue, udpSelector, this));
@@ -195,6 +197,8 @@ public class LocalVPNService extends VpnService
                         dataSent = true;
                         bufferToNetwork.flip();
                         Packet packet = new Packet(bufferToNetwork);
+
+                        inspector.doAnalysis(packet, false);
                         if (packet.isUDP())
                         {
                             deviceToNetworkUDPQueue.offer(packet);
@@ -219,6 +223,14 @@ public class LocalVPNService extends VpnService
                     if (bufferFromNetwork != null)
                     {
                         bufferFromNetwork.flip();
+
+                        Packet packet = new Packet(bufferFromNetwork);
+                        if (packet.isTCP() | packet.isUDP()){
+                            inspector.doAnalysis(packet, true);
+                        }
+
+                        bufferFromNetwork.rewind();
+                        
                         while (bufferFromNetwork.hasRemaining())
                             vpnOutput.write(bufferFromNetwork);
                         dataReceived = true;
