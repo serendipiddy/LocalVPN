@@ -9,11 +9,13 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.concurrent.ExecutionException;
 
 import xyz.hexene.localvpn.Packet;
 
@@ -142,6 +144,17 @@ public class Inspector {
         }
 
         public String toString() {
+//            HostRequest hr = new HostRequest();
+//            hr.execute(address);
+//            String a = address;
+//            try {
+//                a = hr.get();
+//            } catch (ExecutionException e) {
+//                e.printStackTrace();
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+
             return address
                     +"\n    rx:"+rx+"/"+rx_bytes+"B"
                     +"\n    tx:"+tx+"/"+tx_bytes+"B";

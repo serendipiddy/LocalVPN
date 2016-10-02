@@ -13,7 +13,9 @@ public class HostRequest extends AsyncTask<String, Void, String> {
     protected String doInBackground(String... params) {
         String ipaddr = params[0];
         try {
-            return InetAddress.getByName(ipaddr).getHostAddress();
+            InetAddress ia = InetAddress.getByName(ipaddr);
+            String name = ia.getCanonicalHostName();
+            return name;
         }catch (Exception e) {
             Log.d("Request_doInBG", "Error: (" + e.getClass() + ") -- " + e.getMessage());
         }
