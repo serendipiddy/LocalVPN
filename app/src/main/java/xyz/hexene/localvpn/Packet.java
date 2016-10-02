@@ -286,6 +286,10 @@ public class Packet
             //this.optionsAndPadding = buffer.getInt();
         }
 
+        public String getProtocolNum() {
+            return Integer.toHexString(protocolNum);
+        }
+
         public void fillHeader(ByteBuffer buffer)
         {
             buffer.put((byte) (this.version << 4 | this.IHL));
