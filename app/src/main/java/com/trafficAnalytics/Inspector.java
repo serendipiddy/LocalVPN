@@ -1,5 +1,6 @@
 package com.trafficAnalytics;
 
+import android.content.Context;
 import android.util.Log;
 
 import java.net.Inet4Address;
@@ -21,19 +22,21 @@ public class Inspector {
     private HashSet<InetAddress> destinations;
     private HashMap<InetAddress, Integer[]> seen;
     private final int MAX_PKT_SIZE = 65535;
+    private StatLogger logger;
 
-    public Inspector(Collection<InetAddress> destinations) {
-        init();
+    public Inspector(Collection<InetAddress> destinations, Context context) {
+        init(context);
         destinations.addAll(destinations);
     }
 
-    public Inspector() {
-        init();
+    public Inspector(Context context) {
+        init(context);
     }
 
-    private void init() {
+    private void init(Context context) {
         destinations = new HashSet<InetAddress>();
         seen = new HashMap<InetAddress, Integer[]>();
+        logger = new StatLogger(context);
     }
 
     /**
@@ -55,12 +58,12 @@ public class Inspector {
     }
 
     public void doAnalysis(Packet packet, boolean rx) {
-//        Log.i(TAG, "TCP PACKET, dst:"+ packet.ip4Header.destinationAddress.getHostAddress());
+//        Log.i(TAG, "PACKET, dst:"+ packet.ip4Header.destinationAddress.getHostAddress());
 
         // check destination against filter
 
         if (packet.isTCP()) {
-            Log.d(TAG,
+            logger.log(
                     "TCP " + (rx ? "Rx " : "Tx ") +
                             packet.ip4Header.sourceAddress + " " +
                             packet.ip4Header.destinationAddress + " " +
@@ -71,7 +74,7 @@ public class Inspector {
             );
         }
         else if (packet.isUDP()) {
-            Log.d(TAG,
+            logger.log(
                     "UDP " + (rx ? "Rx " : "Tx ") +
                             packet.ip4Header.sourceAddress + " " +
                             packet.ip4Header.destinationAddress + " " +
@@ -81,7 +84,7 @@ public class Inspector {
             );
         }
         else {
-            Log.d(TAG,
+            logger.log(
                     "Other " + (rx ? "Rx " : "Tx ") +
                             packet.ip4Header.sourceAddress + " " +
                             packet.ip4Header.destinationAddress + " " +
