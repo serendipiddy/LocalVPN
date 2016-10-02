@@ -24,8 +24,18 @@ import android.net.VpnService;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
+
+import com.trafficAnalytics.Inspector;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class LocalVPN extends ActionBarActivity
@@ -64,6 +74,35 @@ public class LocalVPN extends ActionBarActivity
         waitingForVPNStart = false;
         LocalBroadcastManager.getInstance(this).registerReceiver(vpnStateReceiver,
                 new IntentFilter(LocalVPNService.BROADCAST_VPN_STATE));
+
+        final Button viewStatsButton = (Button)findViewById(R.id.view_stats_button);
+        viewStatsButton.setOnClickListener(new View.OnClickListener() {
+           /**
+            * Display the currently collected network stats
+            * @param v
+            */
+            @Override
+            public void onClick(View v) {
+                if (LocalVPNService.inspector == null) {
+                    Log.i("LocalVPN", "inspector no init");
+                    return;
+                }
+                List<Inspector.TrafficStat> traffic = LocalVPNService.inspector.getStats();
+
+                List<String> items = new ArrayList<>();
+                for (Inspector.TrafficStat ts : traffic) {
+                    items.add(ts.toString());
+                }
+
+                ArrayAdapter<String> ad = new ArrayAdapter<>(getBaseContext(), R.layout.simple_text_view);
+                ListView lv = (ListView) findViewById(R.id.view_stats_list);
+                lv.setAdapter(ad);
+
+                ad.addAll(items);
+            }
+        }
+
+        );
     }
 
     private void startVPN()
