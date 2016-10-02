@@ -87,14 +87,17 @@ public class StatLogger {
 
     public Queue<String> getRecords(Context context) {
         Queue<String> lines = new LinkedList<>();
-        try {
-            BufferedReader buf = new BufferedReader(new FileReader(logfile));
-            while(buf.ready())
-                lines.add(buf.readLine());
-            buf.close();
-        }
-        catch(IOException e) {
-            e.printStackTrace();
+        if (logfile.exists()) {
+            try {
+
+                BufferedReader buf = new BufferedReader(new FileReader(logfile));
+                while(buf.ready())
+                    lines.add(buf.readLine());
+                buf.close();
+            }
+            catch(IOException e) {
+                e.printStackTrace();
+            }
         }
         return lines;
     }
