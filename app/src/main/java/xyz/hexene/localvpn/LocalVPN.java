@@ -33,9 +33,7 @@ import android.widget.ListView;
 import com.trafficAnalytics.Inspector;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 public class LocalVPN extends ActionBarActivity
@@ -87,7 +85,7 @@ public class LocalVPN extends ActionBarActivity
                     Log.i("LocalVPN", "inspector no init");
                     return;
                 }
-                List<Inspector.TrafficStat> traffic = LocalVPNService.inspector.getStats();
+                List<Inspector.TrafficStat> traffic = LocalVPNService.inspector.getIpAddrStats();
 
                 List<String> items = new ArrayList<>();
                 for (Inspector.TrafficStat ts : traffic) {

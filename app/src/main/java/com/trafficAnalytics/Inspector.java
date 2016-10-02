@@ -47,7 +47,7 @@ public class Inspector {
 
     }
 
-    public List<TrafficStat> getStats(){
+    public List<TrafficStat> getIpAddrStats(){
         List<TrafficStat> rv = new ArrayList<>();
 
         for (Map.Entry<InetAddress,Integer[]> e: seen.entrySet()) {
@@ -57,10 +57,10 @@ public class Inspector {
         return rv;
     }
 
-    public void doAnalysis(Packet packet, boolean rx) {
+    public void recordPacket(Packet packet, boolean rx) {
 //        Log.i(TAG, "PACKET, dst:"+ packet.ip4Header.destinationAddress.getHostAddress());
 
-        // check destination against filter
+        // TODO check destination against filter
 
         if (packet.isTCP()) {
             logger.log(

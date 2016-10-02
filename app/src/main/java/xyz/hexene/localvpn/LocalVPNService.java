@@ -199,7 +199,7 @@ public class LocalVPNService extends VpnService
                         bufferToNetwork.flip();
                         Packet packet = new Packet(bufferToNetwork);
 
-                        inspector.doAnalysis(packet, false);
+                        inspector.recordPacket(packet, false);
                         if (packet.isUDP())
                         {
                             deviceToNetworkUDPQueue.offer(packet);
@@ -235,7 +235,7 @@ public class LocalVPNService extends VpnService
 
                         Packet packet = new Packet(bufferFromNetwork);
                         if (packet.isTCP() | packet.isUDP()){
-                            inspector.doAnalysis(packet, true);
+                            inspector.recordPacket(packet, true);
                         }
 
 
