@@ -225,16 +225,19 @@ public class LocalVPNService extends VpnService
                     {
                         bufferFromNetwork.flip();
 
+                        while (bufferFromNetwork.hasRemaining()) {
+                            vpnOutput.write(bufferFromNetwork);
+                        }
+                        dataReceived = true;
+
+                        // Rewind and examine the packet before releasing the buffer
+                        bufferFromNetwork.rewind();
+
                         Packet packet = new Packet(bufferFromNetwork);
                         if (packet.isTCP() | packet.isUDP()){
                             inspector.doAnalysis(packet, true);
                         }
 
-                        bufferFromNetwork.rewind();
-                        
-                        while (bufferFromNetwork.hasRemaining())
-                            vpnOutput.write(bufferFromNetwork);
-                        dataReceived = true;
 
                         ByteBufferPool.release(bufferFromNetwork);
                     }

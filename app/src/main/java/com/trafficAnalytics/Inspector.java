@@ -59,6 +59,36 @@ public class Inspector {
 
         // check destination against filter
 
+        if (packet.isTCP()) {
+            Log.d(TAG,
+                    "TCP " + (rx ? "Rx " : "Tx ") +
+                            packet.ip4Header.sourceAddress + " " +
+                            packet.ip4Header.destinationAddress + " " +
+                            packet.tcpHeader.sourcePort + " " +
+                            packet.tcpHeader.destinationPort + " " +
+                            packet.tcpHeader.sequenceNumber + " " +
+                            (packet.ip4Header.totalLength - packet.ip4Header.headerLength)
+            );
+        }
+        else if (packet.isUDP()) {
+            Log.d(TAG,
+                    "UDP " + (rx ? "Rx " : "Tx ") +
+                            packet.ip4Header.sourceAddress + " " +
+                            packet.ip4Header.destinationAddress + " " +
+                            packet.udpHeader.sourcePort + " " +
+                            packet.udpHeader.destinationPort + " " +
+                            packet.udpHeader.length
+            );
+        }
+        else {
+            Log.d(TAG,
+                    "Other " + (rx ? "Rx " : "Tx ") +
+                            packet.ip4Header.sourceAddress + " " +
+                            packet.ip4Header.destinationAddress + " " +
+                            packet.ip4Header.getProtocolNum()
+                    );
+        }
+
         if (rx) {
             InetAddress src = packet.ip4Header.sourceAddress;
             if (!seen.containsKey(src)) {
