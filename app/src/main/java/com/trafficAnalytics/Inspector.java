@@ -148,7 +148,6 @@ public class Inspector {
         }
 
         public Integer[] addrToIntArray(String addr) {
-            Log.i(TAG, addr);
             StringTokenizer st = new StringTokenizer(addr, ".");
             Integer[] iAddr = new Integer[]{
                     Integer.parseInt(st.nextToken()),
