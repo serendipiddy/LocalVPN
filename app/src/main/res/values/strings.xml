@@ -6,5 +6,6 @@
     <string name="stop_vpn">Stop from Notification Bar</string>
     <string name="action_settings">Settings</string>
     <string name="view_stats">View Stats</string>
+    <string name="view_saved_stats">View Saved Stats</string>
 
 </resources>

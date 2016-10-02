@@ -73,19 +73,20 @@ public class LocalVPN extends ActionBarActivity
         LocalBroadcastManager.getInstance(this).registerReceiver(vpnStateReceiver,
                 new IntentFilter(LocalVPNService.BROADCAST_VPN_STATE));
 
-        final Button viewStatsButton = (Button)findViewById(R.id.view_stats_button);
-        viewStatsButton.setOnClickListener(new View.OnClickListener() {
-           /**
-            * Display the currently collected network stats
-            * @param v
-            */
+        /* View saved stats button */
+        final Button viewSavedStatsButton = (Button)findViewById(R.id.view_saved_stats_button);
+        viewSavedStatsButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Display the currently collected network stats
+             * @param v
+             */
             @Override
             public void onClick(View v) {
                 if (LocalVPNService.inspector == null) {
                     Log.i("LocalVPN", "inspector no init");
                     return;
                 }
-                List<Inspector.TrafficStat> traffic = LocalVPNService.inspector.getIpAddrStats();
+                List<Inspector.TrafficStat> traffic = LocalVPNService.inspector.readStatsFromFile(getBaseContext());
 
                 List<String> items = new ArrayList<>();
                 for (Inspector.TrafficStat ts : traffic) {
@@ -98,9 +99,7 @@ public class LocalVPN extends ActionBarActivity
 
                 ad.addAll(items);
             }
-        }
-
-        );
+        });
     }
 
     private void startVPN()

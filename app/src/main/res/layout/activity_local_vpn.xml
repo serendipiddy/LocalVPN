@@ -13,10 +13,10 @@
             android:layout_height="wrap_content"
             android:text="@string/start_vpn" />
 
-    <Button android:id="@+id/view_stats_button"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/view_stats"
+    <Button android:id="@+id/view_saved_stats_button"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/view_saved_stats"
         android:layout_below="@+id/vpn"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
@@ -24,7 +24,7 @@
         android:id="@+id/view_stats_list"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_below="@+id/view_stats_button"
+        android:layout_below="@+id/view_saved_stats_button"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 </RelativeLayout>
