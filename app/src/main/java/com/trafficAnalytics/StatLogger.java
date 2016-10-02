@@ -4,10 +4,14 @@ import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -79,5 +83,19 @@ public class StatLogger {
     public void log(String text) {
 //        Log.i(TAG, "Adding to queue \""+text+"\"");
         outputBuffer.add(System.currentTimeMillis()+" "+text);
+    }
+
+    public Queue<String> getRecords(Context context) {
+        Queue<String> lines = new LinkedList<>();
+        try {
+            BufferedReader buf = new BufferedReader(new FileReader(logfile));
+            while(buf.ready())
+                lines.add(buf.readLine());
+            buf.close();
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+        return lines;
     }
 }

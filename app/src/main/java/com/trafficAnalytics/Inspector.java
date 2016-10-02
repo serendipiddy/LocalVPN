@@ -3,6 +3,7 @@ package com.trafficAnalytics;
 import android.content.Context;
 import android.util.Log;
 
+import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -62,6 +63,50 @@ public class Inspector {
         return rv;
     }
 
+    public List<TrafficStat> readStatsFromFile(Context context) {
+        HashMap<String, Integer[]> host_stats = new HashMap<>();
+
+        /* Populate the host records */
+        for (String s : logger.getRecords(context)) {
+            s.replace("/","");
+            StringTokenizer st = new StringTokenizer(s," ");
+            // time proto direction src dst p q len
+            String time = st.nextToken();
+            String proto = st.nextToken();
+            String direction = st.nextToken();
+            String src_ip= st.nextToken();
+            String dst_ip = st.nextToken();
+            String src_port = st.nextToken();
+            String dst_port = st.nextToken();
+            String len = st.nextToken();
+            boolean rx = direction.equals("Rx");
+
+            if (rx) {
+                if (!host_stats.containsKey(src_ip)) {
+                    host_stats.put(src_ip, new Integer[]{0,0,0,0});
+                }
+                host_stats.get(src_ip)[1] = host_stats.get(src_ip)[1] + 1;
+                host_stats.get(src_ip)[3] = host_stats.get(src_ip)[3] + Integer.parseInt(len);
+            }
+            else {
+                if (!host_stats.containsKey(dst_ip)) {
+                    host_stats.put(dst_ip, new Integer[]{0,0,0,0});
+                }
+                host_stats.get(dst_ip)[0] = host_stats.get(dst_ip)[0] + 1;
+                host_stats.get(dst_ip)[2] = host_stats.get(dst_ip)[2] + Integer.parseInt(len);
+            }
+        }
+
+        /* Convert host records into a list */
+        List<TrafficStat> rv = new ArrayList<>();
+        for (Map.Entry<InetAddress,Integer[]> e: seen.entrySet()) {
+            TrafficStat ts = new TrafficStat(e.getKey().getHostAddress(), e.getValue());
+            rv.add(ts);
+        }
+        Collections.sort(rv);
+        return rv;
+    }
+
     public void recordPacket(Packet packet, boolean rx) {
 //        Log.i(TAG, "PACKET, dst:"+ packet.ip4Header.destinationAddress.getHostAddress());
 
@@ -74,7 +119,6 @@ public class Inspector {
                             packet.ip4Header.destinationAddress + " " +
                             packet.tcpHeader.sourcePort + " " +
                             packet.tcpHeader.destinationPort + " " +
-                            packet.tcpHeader.sequenceNumber + " " +
                             (packet.ip4Header.totalLength - packet.ip4Header.headerLength)
             );
         }
