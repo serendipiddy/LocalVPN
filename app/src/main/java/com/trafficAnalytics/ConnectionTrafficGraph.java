@@ -9,6 +9,7 @@ public class ConnectionTrafficGraph extends AppCompatActivity {
 
     /*
     Based on quickstart guide: http://androidplot.com/docs/quickstart/
+    or rather: https://github.com/halfhp/androidplot/blob/master/docs/quickstart.md
      */
 
     @Override
