@@ -120,7 +120,7 @@ public class Inspector {
         }
         else {
             logger.log(
-                    packet.ip4Header.getProtocolNum() + (rx ? "Rx " : "Tx ") +
+                    packet.ip4Header.getProtocolNum() + (rx ? " Rx " : " Tx ") +
                             packet.ip4Header.sourceAddress + " " +
                             packet.ip4Header.destinationAddress + " - - " +
                             (packet.ip4Header.totalLength - packet.ip4Header.headerLength)
